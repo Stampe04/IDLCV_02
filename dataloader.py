@@ -5,7 +5,7 @@ from datasets import FrameVideoDataset
 
 
 def get_video_loaders(
-    root_dir='/dtu/datasets1/02516',
+    root_dir='/dtu/datasets1/02516/ufc10',
     batch_size=16,
     num_workers=4
 ):
