@@ -10,7 +10,9 @@ def train_model(
     optimizer,
     device,
     num_epochs=20,
-    save_path="metrics.csv"
+    save_path="metrics.csv",
+    best_model_path="best_model.pt",
+    scheduler=None
 ):
     train_losses = []
     val_losses = []
@@ -79,12 +81,34 @@ def train_model(
         val_loss = val_running_loss / len(val_loader)
         val_accuracy = val_correct / val_total
 
+        # learning rate scheduler
+        if scheduler is not None:
+            scheduler.step(val_loss)
+
+
+        current_lr = optimizer.param_groups[0]["lr"]
+
         # Store metrics
         train_losses.append(train_loss)
         val_losses.append(val_loss)
 
         train_accuracies.append(train_accuracy)
         val_accuracies.append(val_accuracy)
+
+        # Save best model
+        if val_accuracy > best_val_accuracy:
+
+            best_val_accuracy = val_accuracy
+
+            torch.save(
+                model.state_dict(),
+                best_model_path
+            )
+
+            print(
+                f"New best model saved "
+                f"(val acc: {best_val_accuracy:.4f})"
+            )
 
         # Save metrics
         metrics = pd.DataFrame({
