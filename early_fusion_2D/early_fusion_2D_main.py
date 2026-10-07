@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 from dataloader import get_video_loaders
-from training import train_model
+from train import train_model
 from early_fusion_2D.early_fusion_2D_model import EarlyFusion2D
 
 
@@ -54,15 +54,9 @@ def main():
         device=device,
         num_epochs=100,
 
-        save_path=(
-            "results/early_fusion_2D/metrics/"
-            "early_fusion_metrics.csv"
-        ),
+        save_path="early_fusion_2D/results/early_fusion_metrics.csv",
 
-        best_model_path=(
-            "results/early_fusion_2D/"
-            "best_model.pt"
-        ),
+        best_model_path="early_fusion_2D/results/best_model.pt",
 
         scheduler=scheduler
     )
