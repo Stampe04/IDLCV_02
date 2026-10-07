@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import pandas as pd
 
 from dataloader import get_video_loaders
 from early_fusion_2D.early_fusion_2D_model import EarlyFusion2D
@@ -101,6 +102,20 @@ for epoch in range(num_epochs):
 
     train_accuracies.append(train_accuracy)
     val_accuracies.append(val_accuracy)
+
+    # save metrics
+        metrics = pd.DataFrame({
+        "epoch": range(1, len(train_losses) + 1),
+        "train_loss": train_losses,
+        "val_loss": val_losses,
+        "train_accuracy": train_accuracies,
+        "val_accuracy": val_accuracies
+    })
+
+    metrics.to_csv(
+        "early_fusion_2D/early_fusion_metrics.csv",
+        index=False
+    )
 
     # Print results
     print(
