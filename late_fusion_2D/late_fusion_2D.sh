@@ -7,7 +7,7 @@
 #BSUB -gpu "num=1:mode=exclusive_process"
 
 ### Job name
-#BSUB -J late_fusion_2D
+#BSUB -J late_2D
 
 ### CPU cores
 #BSUB -n 4
