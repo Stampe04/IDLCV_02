@@ -5,24 +5,19 @@ from dataloader import get_video_loaders
 from early_fusion_2D.early_fusion_2D_model import EarlyFusion2D
 
 # Device
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 print("Using device:", device)
 
 # Data
-
 train_loader, val_loader, test_loader = get_video_loaders()
 
 # Model
-
 model = EarlyFusion2D(
     num_classes=10,
     num_frames=10
 ).to(device)
 
 # Loss and optimizer
-
 criterion = nn.CrossEntropyLoss()
 
 optimizer = torch.optim.Adam(
@@ -30,13 +25,17 @@ optimizer = torch.optim.Adam(
     lr=1e-3
 )
 
-# Training
+# Store metrics
+train_losses = []
+val_losses = []
 
+train_accuracies = []
+val_accuracies = []
+
+# Training
 num_epochs = 20
 
 for epoch in range(num_epochs):
-
-# Training
 
     model.train()
 
@@ -68,8 +67,7 @@ for epoch in range(num_epochs):
     train_loss = running_loss / len(train_loader)
     train_accuracy = correct / total
 
-# Validation
-
+    # Validation
     model.eval()
 
     val_running_loss = 0.0
@@ -97,8 +95,14 @@ for epoch in range(num_epochs):
     val_loss = val_running_loss / len(val_loader)
     val_accuracy = val_correct / val_total
 
-# Results
+    # Store metrics
+    train_losses.append(train_loss)
+    val_losses.append(val_loss)
 
+    train_accuracies.append(train_accuracy)
+    val_accuracies.append(val_accuracy)
+
+    # Print results
     print(
         f"Epoch {epoch + 1}/{num_epochs} | "
         f"Train loss: {train_loss:.4f} | "
