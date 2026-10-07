@@ -6,3 +6,10 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ipynb_checkpoints/
+<<<<<<< HEAD
+*.err
+*.out
+*.csv
+=======
+*/results
+>>>>>>> d8385a28a8aed9cc9ef28c417bf19dad5ad2f224
