@@ -5,7 +5,6 @@ from dataloader import get_video_loaders
 from train import train_model
 from late_fusion_2D.late_fusion_2D import LateFusion2D
 
-
 def main():
 
     # Device
@@ -16,13 +15,13 @@ def main():
     print("Using device:", device)
 
     # Data
-    train_loader, val_loader, test_loader = get_video_loaders(
+    train_loader, val_loader, _ = get_video_loaders(
         batch_size=16,
         num_workers=4
     )
 
     # Model
-    model = LateFusion2D(
+    model = EarlyFusion2D(
         num_classes=10,
         num_frames=10
     ).to(device)
@@ -36,6 +35,14 @@ def main():
         lr=1e-3
     )
 
+    # Learning-rate scheduler
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer,
+        mode="min",
+        factor=0.5,
+        patience=5
+    )
+
     # Train
     train_model(
         model=model,
@@ -44,8 +51,10 @@ def main():
         criterion=criterion,
         optimizer=optimizer,
         device=device,
-        num_epochs=20,
-        save_path="late_fusion_2D/results/late_fusion_metrics.csv"
+        num_epochs=100,
+        save_path="late_fusion_2D/results/late_fusion_metrics.csv",
+        best_model_path="late_fusion_2D/results/best_model.pt",
+        scheduler=scheduler
     )
 
 
