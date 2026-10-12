@@ -21,7 +21,7 @@ def main():
     )
 
     # Model
-    model = EarlyFusion2D(
+    model = LateFusion2D(
         num_classes=10,
         num_frames=10
     ).to(device)
