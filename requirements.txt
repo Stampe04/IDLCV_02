@@ -2,3 +2,4 @@ pandas
 Pillow
 torch
 torchvision
+sklearn
