@@ -80,11 +80,12 @@ class PerFrame2D(nn.Module):
 
         x = self.model(x)
 
-        x = x.reshape(B, -1)
-        x = self.classifier(x)
+        x = self.fc(x)
+        x = x.reshape(B, T, -1)
+        x = x.mean(dim=1) # average of predictions
 
         x = self.softmax(x)
-        
+
         return x
 
 if __name__ == "__main__":

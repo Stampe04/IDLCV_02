@@ -3,7 +3,7 @@ import torch.nn as nn
 
 from dataloader import get_video_loaders
 from train import train_model
-from late_fusion_2D.late_fusion_2D import LateFusion2D
+from per_frame_2D.per_frame_2D import PerFrame2D
 
 def main():
 
@@ -21,7 +21,7 @@ def main():
     )
 
     # Model
-    model = EarlyFusion2D(
+    model = PerFrame2D(
         num_classes=10,
         num_frames=10
     ).to(device)

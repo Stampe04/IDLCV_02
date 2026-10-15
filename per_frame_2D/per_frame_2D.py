@@ -29,7 +29,6 @@ class PerFrame2D(nn.Module):
             nn.AdaptiveAvgPool2d((1, 1)),
             nn.Flatten()
         )
-        self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, x):
         B, C, T, H, W = x.shape
@@ -43,7 +42,7 @@ class PerFrame2D(nn.Module):
         x = x.reshape(B, T, -1)
         x = x.mean(dim=1) # average of predictions
 
-        x = self.softmax(x)
+        # No softmax because CrossEntropyLoss
 
         return x
 

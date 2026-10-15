@@ -7,7 +7,7 @@
 #BSUB -gpu "num=1:mode=exclusive_process"
 
 ### Job name
-#BSUB -J late_2D
+#BSUB -J per_frame_2D
 
 ### CPU cores
 #BSUB -n 4
@@ -20,8 +20,8 @@
 #BSUB -W 12:00
 
 ### Output files
-#BSUB -o late_fusion_2D/results/late_fusion_%J.out
-#BSUB -e late_fusion_2D/results/late_fusion_%J.err
+#BSUB -o per_frame_2D/results/per_frame_2D_%J.out
+#BSUB -e per_frame_2D/results/per_frame_2D_%J.err
 
 
 # Go to project directory
@@ -31,4 +31,5 @@ cd ~/IDLCV_02
 source .venv/bin/activate
 
 # Run late fusion experiment
-python -m late_fusion_2D.late_fusion_2D_main
+# python -m per_frame_2D.per_frame_2D_main
+python -m per_frame_2D.per_frame_2D_evaluate
