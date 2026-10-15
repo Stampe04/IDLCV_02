@@ -162,23 +162,32 @@ class ResNet_3D(nn.Module):
         block,
         layers,
         num_classes=10,
-        in_channels=3
+        in_channels=3,
+        base_channels=64,
+        dropout=0.0
     ):
         super().__init__()
 
-        self.in_planes = 64
+        if len(layers) != 4:
+            raise ValueError("layers must contain four stage depths")
+        if base_channels <= 0:
+            raise ValueError("base_channels must be positive")
+        if not 0.0 <= dropout < 1.0:
+            raise ValueError("dropout must be in the range [0.0, 1.0)")
+
+        self.in_planes = base_channels
 
         # Initial convolution
         self.conv1 = nn.Conv3d(
             in_channels,
-            64,
+            base_channels,
             kernel_size=7,
             stride=2,
             padding=3,
             bias=False
         )
 
-        self.bn1 = nn.BatchNorm3d(64)
+        self.bn1 = nn.BatchNorm3d(base_channels)
         self.relu = nn.ReLU(inplace=True)
 
         self.maxpool = nn.MaxPool3d(
@@ -190,37 +199,38 @@ class ResNet_3D(nn.Module):
         # ResNet stages
         self.layer1 = self._make_layer(
             block,
-            64,
+            base_channels,
             layers[0],
             stride=1
         )
 
         self.layer2 = self._make_layer(
             block,
-            128,
+            base_channels * 2,
             layers[1],
             stride=2
         )
 
         self.layer3 = self._make_layer(
             block,
-            256,
+            base_channels * 4,
             layers[2],
             stride=2
         )
 
         self.layer4 = self._make_layer(
             block,
-            512,
+            base_channels * 8,
             layers[3],
             stride=2
         )
 
         # Classification head
         self.avgpool = nn.AdaptiveAvgPool3d((1, 1, 1))
+        self.dropout = nn.Dropout(p=dropout)
 
         self.fc = nn.Linear(
-            512 * block.expansion,
+            base_channels * 8 * block.expansion,
             num_classes
         )
 
@@ -277,7 +287,7 @@ class ResNet_3D(nn.Module):
         x = self.avgpool(x)
 
         x = torch.flatten(x, 1)
-
+        x = self.dropout(x)
         x = self.fc(x)
 
         return x

@@ -9,5 +9,5 @@ __pycache__/
 *.err
 *.out
 *.csv
-*/results
+*/results*
 *.pt
