@@ -94,6 +94,42 @@ class FrameVideoDataset(torch.utils.data.Dataset):
         return frames
 
 
+class TwoStreamDataset(torch.utils.data.Dataset):
+    def __init__(self, root_dir, split='train', transform=None,
+                 flow_channels=3, n_flows=9, train_random_frame=True):
+        self.video_paths = sorted(glob(f'{root_dir}/videos/{split}/*/*.avi'))
+        self.df = pd.read_csv(f'{root_dir}/metadata/{split}.csv')
+        self.transform = transform or T.ToTensor()
+        self.flow_channels = flow_channels
+        self.n_flows = n_flows
+        self.random_frame = train_random_frame and split == 'train'
+
+    def __len__(self):
+        return len(self.video_paths)
+
+    def __getitem__(self, idx):
+        video_path = self.video_paths[idx]
+        video_name = video_path.split('/')[-1].split('.avi')[0]
+        label = self.df.loc[self.df['video_name'] == video_name, 'label'].item()
+
+        base = video_path.split('.avi')[0]
+        frames_dir = base.replace('videos', 'frames')
+        flows_dir = base.replace('videos', 'flows_png')
+
+        i = torch.randint(1, 11, (1,)).item() if self.random_frame else 5
+        frame = Image.open(os.path.join(frames_dir, f'frame_{i}.jpg')).convert('RGB')
+        frame = self.transform(frame)        
+
+        flow_files = sorted(glob(f'{flows_dir}/*.png'))[:self.n_flows]
+        flows = []
+        for f in flow_files:
+            x = self.transform(Image.open(f).convert('RGB')) 
+            flows.append(x[:self.flow_channels])
+        flow = torch.cat(flows, dim=0)
+
+        return (frame, flow), label
+
+
 if __name__ == '__main__':
     from torch.utils.data import DataLoader
 
