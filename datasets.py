@@ -116,16 +116,14 @@ class TwoStreamDataset(torch.utils.data.Dataset):
         frames_dir = base.replace('videos', 'frames')
         flows_dir = base.replace('videos', 'flows_png')
 
-        # spatial: egyetlen frame (tanításnál véletlen, egyébként a középső)
         i = torch.randint(1, 11, (1,)).item() if self.random_frame else 5
         frame = Image.open(os.path.join(frames_dir, f'frame_{i}.jpg')).convert('RGB')
-        frame = self.transform(frame)                       # [3, H, W]
+        frame = self.transform(frame)        
 
-        # temporal: T-1 flow kép csatornák mentén összefűzve
         flow_files = sorted(glob(f'{flows_dir}/*.png'))[:self.n_flows]
         flows = []
         for f in flow_files:
-            x = self.transform(Image.open(f).convert('RGB'))  # [3, H, W]
+            x = self.transform(Image.open(f).convert('RGB')) 
             flows.append(x[:self.flow_channels])
         flow = torch.cat(flows, dim=0)
 
