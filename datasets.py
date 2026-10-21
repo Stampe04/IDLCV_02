@@ -9,9 +9,13 @@ class FrameImageDataset(torch.utils.data.Dataset):
     def __init__(self, 
     root_dir='/dtu/datasets1/02516/ufc10',
     split='train', 
-    transform=None
+    transform=None,
+    flows = False
 ):
-        self.frame_paths = sorted(glob(f'{root_dir}/frames/{split}/*/*/*.jpg'))
+        if flows == True:
+            self.frame_paths = sorted(glob(f'{root_dir}/flows_png/{split}/*/*/*.png'))
+        else:
+            self.frame_paths = sorted(glob(f'{root_dir}/frames/{split}/*/*/*.jpg'))
         self.df = pd.read_csv(f'{root_dir}/metadata/{split}.csv')
         self.split = split
         self.transform = transform
