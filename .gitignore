@@ -11,3 +11,4 @@ __pycache__/
 *.csv
 */results*
 *.pt
+metrics_plots_executed.ipynb
