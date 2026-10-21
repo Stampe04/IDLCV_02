@@ -34,7 +34,7 @@ def main():
         device=device,
         save_path=(
             "late_fusion_2D/results/"
-            "test_metrics.csv"
+            "test_metrics_noleak.csv"
         )
     )
 
