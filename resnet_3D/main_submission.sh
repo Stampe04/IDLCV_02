@@ -34,14 +34,14 @@ PYTHON="${PROJECT_ROOT}/.venv/bin/python"
 export RESNET_3D_DATA_ROOT="/dtu/datasets1/02516/ufc10"
 export RESNET_3D_BATCH_SIZE=16
 export RESNET_3D_NUM_WORKERS=4
-export RESNET_3D_NUM_EPOCHS=100
-export RESNET_3D_LAYERS="3,4,6,3"
-export RESNET_3D_BASE_CHANNELS=16
+export RESNET_3D_NUM_EPOCHS=25
+export RESNET_3D_LAYERS="2,2,2,2"
+export RESNET_3D_BASE_CHANNELS=64
 export RESNET_3D_DROPOUT=0
-export RESNET_3D_LEARNING_RATE=1e-3
+export RESNET_3D_LEARNING_RATE=3e-4
 export RESNET_3D_SCHEDULER_FACTOR=0.5
 export RESNET_3D_SCHEDULER_PATIENCE=5
-export RESNET_3D_RESULTS_DIR="${SCRIPT_DIR}/results"
+export RESNET_3D_RESULTS_DIR="${SCRIPT_DIR}/results_leakage_normal_3_imagenette-weights"
 
 # Run without relying on the caller's current working directory.
 PYTHONPATH="${PROJECT_ROOT}${PYTHONPATH:+:${PYTHONPATH}}" \

@@ -2,6 +2,65 @@ import torch
 import torch.nn as nn
 
 
+def inflate_resnet18_weights(model_3d, model_2d):
+    """
+    Initialize a 3D ResNet-18 from pretrained 2D ResNet-18 weights.
+    """
+
+    state_2d = model_2d.state_dict()
+    state_3d = model_3d.state_dict()
+
+    transferred = []
+    skipped = []
+
+    for name, weights_3d in state_3d.items():
+
+        if name not in state_2d:
+            skipped.append(name)
+            continue
+
+        weights_2d = state_2d[name]
+
+        # Convert Conv2D kernels into Conv3D kernels
+        if weights_2d.ndim == 4 and weights_3d.ndim == 5:
+
+            temporal_size = weights_3d.shape[2]
+
+            inflated = (
+                weights_2d.unsqueeze(2)
+                .repeat(1, 1, temporal_size, 1, 1)
+                / temporal_size
+            )
+
+            if inflated.shape == weights_3d.shape:
+                state_3d[name] = inflated
+                transferred.append(name)
+            else:
+                skipped.append(name)
+
+        # Transfer BatchNorm and other matching parameters
+        elif weights_2d.shape == weights_3d.shape:
+
+            # Initialize a new classifier for video classes
+            if name.startswith("fc."):
+                skipped.append(name)
+                continue
+
+            state_3d[name] = weights_2d.clone()
+            transferred.append(name)
+
+        else:
+            skipped.append(name)
+
+    model_3d.load_state_dict(state_3d)
+
+    print(f"Transferred {len(transferred)} tensors")
+    print(f"Skipped {len(skipped)} tensors")
+    print("Skipped:", skipped)
+
+    return model_3d
+
+
 def conv3x3(in_planes, out_planes, kernel_size=3, stride=1, padding=1):
     """3x3x3 convolution with padding."""
     return nn.Conv3d(
@@ -183,7 +242,7 @@ class ResNet_3D(nn.Module):
             base_channels,
             kernel_size=7,
             stride=2,
-            padding=3,
+            padding=2,
             bias=False
         )
 

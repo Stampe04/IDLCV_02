@@ -7,9 +7,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 if __package__:
-    from .resnet_3D import BasicBlock, ResNet_3D
+    from .resnet_3D import BasicBlock, ResNet_3D, inflate_resnet18_weights
 else:
-    from resnet_3D.resnet_3D import BasicBlock, ResNet_3D
+    from resnet_3D.resnet_3D import BasicBlock, ResNet_3D, inflate_resnet18_weights
 
 from dataloader import get_video_loaders
 from evaluate import evaluate_model
@@ -72,14 +72,36 @@ def main():
         num_workers=num_workers
     )
 
+
+    from torchvision.models import resnet18, ResNet18_Weights
+
+    # Load pretrained 2D ResNet-18
+    model_2d = resnet18(
+        weights=ResNet18_Weights.DEFAULT
+    )
+
+    # Create your 3D ResNet-18
     model = ResNet_3D(
-        BasicBlock,
-        layers,
+        block=BasicBlock,
+        layers=layers,
         num_classes=10,
         in_channels=3,
         base_channels=base_channels,
         dropout=dropout
-    ).to(device)
+    )
+
+    # Transfer pretrained weights
+    model = inflate_resnet18_weights(model, model_2d)
+
+    model = model.to(device)
+
+
+    num_params = sum(
+        p.numel()
+        for p in model.parameters()
+        if p.requires_grad
+    )
+    print(f"Trainable parameters: {num_params:,}")
 
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(
